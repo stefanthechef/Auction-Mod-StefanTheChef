@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "dsauction",
+  "version": "${version}",
+  "name": "DonutSMP Auction Overlay",
+  "description": "Client-side streamer auction HUD + block picker menu for DonutSMP. Tracks TOTAL /pay per player.",
+  "authors": ["you"],
+  "environment": "client",
+  "entrypoints": { "client": ["com.dsauction.DsAuctionClient"] },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
