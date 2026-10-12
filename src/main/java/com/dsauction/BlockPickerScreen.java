@@ -17,7 +17,8 @@ public class BlockPickerScreen extends Screen {
 	private List<Item> filtered = new ArrayList<>();
 	private EditBox search;
 	private Button prev, next, startStop, hud, teleport, startTimer, stopTimer;
-	private EditBox timerHours, timerMinutes, timerSeconds;
+	private EditBox timerHours, timerMinutes, timerSeconds, minimumPaymentField;
+	private Button setMinimumButton;
 	private int page = 0;
 	private String query = "";
 
@@ -81,7 +82,18 @@ public class BlockPickerScreen extends Screen {
         stopTimer = addRenderableWidget(Button.builder(Component.literal("Stop"), b -> {
             AuctionState.stopTimer();
             AuctionState.active = false;
+            updateLabels();
         }).bounds(timerStartX + 222, timerY, 48, 18).build());
+
+        // Minimum accepted payment filter, configured directly in /ac.
+        int minY = timerY + 25;
+        minimumPaymentField = new EditBox(font, width / 2 - 112, minY, 120, 18, Component.literal("Minimum payment"));
+        minimumPaymentField.setHint(Component.literal("0 = no minimum"));
+        minimumPaymentField.setValue(formatInputAmount(AuctionState.minimumPayment));
+        minimumPaymentField.setFilter(v -> v.matches("[0-9,]*(?:\\.[0-9]*)?"));
+        addRenderableWidget(minimumPaymentField);
+        setMinimumButton = addRenderableWidget(Button.builder(Component.literal("Set minimum"), b -> applyMinimumPayment())
+            .bounds(width / 2 + 14, minY, 98, 18).build());
 
 		filter();
 		updateLabels();
@@ -91,6 +103,26 @@ public class BlockPickerScreen extends Screen {
 		startStop.setMessage(Component.literal(AuctionState.active ? "Stop auction" : "Start auction"));
 		hud.setMessage(Component.literal("HUD: " + (AuctionState.hudVisible ? "ON" : "OFF")));
 	}
+
+    private static String formatInputAmount(double amount) {
+        if (amount == Math.floor(amount)) return Long.toString((long) amount);
+        return Double.toString(amount);
+    }
+
+    private void applyMinimumPayment() {
+        try {
+            String raw = minimumPaymentField.getValue().replace(",", "").trim();
+            double amount = raw.isEmpty() ? 0.0 : Double.parseDouble(raw);
+            if (!Double.isFinite(amount) || amount < 0 || amount > 1.0e15) throw new NumberFormatException();
+            AuctionState.minimumPayment = amount;
+            AuctionState.saveHudSettings();
+            if (minecraft != null && minecraft.player != null) {
+                minecraft.player.displayClientMessage(Component.literal("Minimum payment set to " + AuctionState.money(amount) + (amount == 0 ? " (disabled)." : ".")), false);
+            }
+        } catch (NumberFormatException ignored) {
+            if (minecraft != null && minecraft.player != null) minecraft.player.displayClientMessage(Component.literal("Enter a valid minimum amount, e.g. 500000."), false);
+        }
+    }
 
     private void startTimerFromFields() {
         try {
@@ -153,6 +185,7 @@ public class BlockPickerScreen extends Screen {
 		g.drawCenteredString(font, "Page " + (page + 1) + "/" + pages + "  (" + filtered.size() + " items)",
 			width / 2, prev.getY() + 6, 0xFFAAAAAA);
         g.drawString(font, "Timer: hours / minutes / seconds", width / 2 - 112, timerHours.getY() - 10, 0xFFAAAAAA);
+        g.drawString(font, "Ignore payments below this amount (0 = off)", width / 2 - 112, minimumPaymentField.getY() - 10, 0xFFAAAAAA);
 		int sy = timerHours.getY() + 25;
 		g.renderItem(new ItemStack(AuctionState.item), width / 2 - 80, sy - 4);
 		g.drawString(font, "Auction item: " + BlockList.name(AuctionState.item), width / 2 - 58, sy, 0xFFFFD700);

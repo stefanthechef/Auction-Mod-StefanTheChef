@@ -20,6 +20,8 @@ public final class AuctionState {
     public static double hudScale = 1.0;
     public static long timerEndMillis = 0L;
     public static long timerDurationSeconds = 0L;
+    /** Minimum single payment accepted into auction totals; zero disables the filter. */
+    public static double minimumPayment = 0.0;
     public static boolean hudDragging = false;
     public static int dragOffsetX = 0;
     public static int dragOffsetY = 0;
@@ -35,6 +37,7 @@ public final class AuctionState {
                 hudY = Integer.parseInt(p.getProperty("hudY", "6"));
                 hudWidth = Math.max(150, Math.min(280, Integer.parseInt(p.getProperty("hudWidth", "190"))));
                 hudScale = Math.max(0.6, Math.min(2.0, Double.parseDouble(p.getProperty("hudScale", "1.0"))));
+                minimumPayment = Math.max(0.0, Double.parseDouble(p.getProperty("minimumPayment", "0")));
             }
         } catch (IOException | NumberFormatException ignored) { }
     }
@@ -46,6 +49,7 @@ public final class AuctionState {
         p.setProperty("hudY", Integer.toString(hudY));
         p.setProperty("hudWidth", Integer.toString(hudWidth));
         p.setProperty("hudScale", Double.toString(hudScale));
+        p.setProperty("minimumPayment", Double.toString(minimumPayment));
         try {
             Files.createDirectories(path.getParent());
             try (var out = Files.newOutputStream(path)) { p.store(out, "DonutSMP Auction HUD settings"); }
