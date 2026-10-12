@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import org.lwjgl.glfw.GLFW;
 
 /** The little overlay: item being auctioned, top bidder and the TOTAL they've paid. */
 public final class AuctionHud {
@@ -25,9 +26,10 @@ public final class AuctionHud {
             AuctionState.setPreviousLeftPressed(false);
             return;
         }
-        boolean pressed = mc.mouseHandler.isLeftPressed();
-        double scaleX = (double) mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth();
-        double scaleY = (double) mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight();
+        boolean pressed = GLFW.glfwGetMouseButton(mc.getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
+        // MouseHandler xpos/ypos are in window coordinates, not framebuffer pixels.
+        double scaleX = (double) mc.getWindow().getGuiScaledWidth() / Math.max(1, mc.getWindow().getWindowWidth());
+        double scaleY = (double) mc.getWindow().getGuiScaledHeight() / Math.max(1, mc.getWindow().getWindowHeight());
         int mouseX = (int) (mc.mouseHandler.xpos() * scaleX);
         int mouseY = (int) (mc.mouseHandler.ypos() * scaleY);
         int w = (int) Math.ceil(AuctionState.hudWidth * AuctionState.hudScale);
@@ -56,8 +58,8 @@ public final class AuctionHud {
     public static void onScroll(double vertical) {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null || (mc.screen != null && !(mc.screen instanceof ChatScreen)) || !AuctionState.hudVisible || vertical == 0) return;
-        double scaleX = (double) mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth();
-        double scaleY = (double) mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight();
+        double scaleX = (double) mc.getWindow().getGuiScaledWidth() / Math.max(1, mc.getWindow().getWindowWidth());
+        double scaleY = (double) mc.getWindow().getGuiScaledHeight() / Math.max(1, mc.getWindow().getWindowHeight());
         int mouseX = (int) (mc.mouseHandler.xpos() * scaleX);
         int mouseY = (int) (mc.mouseHandler.ypos() * scaleY);
         int w = (int) Math.ceil(AuctionState.hudWidth * AuctionState.hudScale);
@@ -75,8 +77,8 @@ public final class AuctionHud {
 
     public static boolean isHudHovered(Minecraft mc) {
         if (mc == null || !AuctionState.hudVisible || mc.options.hideGui || mc.screen == null || !(mc.screen instanceof ChatScreen)) return false;
-        double scaleX = (double) mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth();
-        double scaleY = (double) mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight();
+        double scaleX = (double) mc.getWindow().getGuiScaledWidth() / Math.max(1, mc.getWindow().getWindowWidth());
+        double scaleY = (double) mc.getWindow().getGuiScaledHeight() / Math.max(1, mc.getWindow().getWindowHeight());
         int mouseX = (int) (mc.mouseHandler.xpos() * scaleX);
         int mouseY = (int) (mc.mouseHandler.ypos() * scaleY);
         int w = (int)Math.ceil(AuctionState.hudWidth * AuctionState.hudScale);
