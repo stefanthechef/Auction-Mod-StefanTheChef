@@ -84,9 +84,9 @@ public final class AuctionHud {
         int x = AuctionState.hudX < 0 ? g.guiWidth() - w - 6 : Math.max(0, Math.min(AuctionState.hudX, g.guiWidth() - w));
         int y = Math.max(0, Math.min(AuctionState.hudY, g.guiHeight() - h));
 
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0);
-        g.pose().scale((float)AuctionState.hudScale, (float)AuctionState.hudScale, 1.0f);
+        g.pose().pushMatrix();
+        g.pose().translate((float)x, (float)y);
+        g.pose().scale((float)AuctionState.hudScale, (float)AuctionState.hudScale);
         g.fill(0, 0, baseW, baseH, 0xC0101010);
         g.fill(0, 0, baseW, 1, 0xFFFFD700);
         g.fill(0, baseH - 1, baseW, baseH, 0xFFFFD700);
@@ -100,7 +100,7 @@ public final class AuctionHud {
         g.fill(6, 37, baseW - 6, 38, 0x55FFFFFF);
         if (rank.isEmpty()) {
             g.drawString(f, "No bids yet", 6, 46, 0xFFAAAAAA);
-            g.pose().popPose();
+            g.pose().popMatrix();
             return;
         }
         Map.Entry<String, Double> top = rank.get(0);
@@ -115,6 +115,6 @@ public final class AuctionHud {
             String a = AuctionState.money(e.getValue());
             g.drawString(f, a, baseW - 6 - f.width(a), 56 + i * 10, 0xFFAAAAAA);
         }
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 }

@@ -56,7 +56,7 @@ public class BlockPickerScreen extends Screen {
         teleport = addRenderableWidget(Button.builder(Component.literal("TP to winner (prefill /tpa)"), b -> {
             List<Map.Entry<String, Double>> ranking = AuctionState.ranking();
             if (!ranking.isEmpty() && minecraft != null) {
-                minecraft.setScreen(new ChatScreen("/tpa " + ranking.get(0).getKey()));
+                minecraft.setScreen(new ChatScreen("/tpa " + ranking.get(0).getKey(), false));
             }
         }).bounds(width / 2 - 100, by + 24, 200, 20).build());
 
