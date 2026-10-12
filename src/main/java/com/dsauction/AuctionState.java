@@ -9,6 +9,9 @@ public final class AuctionState {
 	public static Item item = Items.DIAMOND_BLOCK;
 	public static boolean active = false;
 	public static boolean hudVisible = true;
+    public static int hudX = -1; // -1 means right aligned
+    public static int hudY = 6;
+    public static int hudWidth = 190;
 	/** player name -> TOTAL of every /pay they sent you during the auction. */
 	public static final Map<String, Double> totals = new LinkedHashMap<>();
 

@@ -21,9 +21,10 @@ public final class AuctionHud {
 		if (!AuctionState.hudVisible || mc.options.hideGui) return;
 		Font f = mc.font;
 		List<Map.Entry<String, Double>> rank = AuctionState.ranking();
-		int w = 160, rows = Math.min(2, Math.max(0, rank.size() - 1));
+		int w = AuctionState.hudWidth, rows = Math.min(2, Math.max(0, rank.size() - 1));
 		int h = 76 + rows * 10;
-		int x = g.guiWidth() - w - 6, y = 6;
+		int x = AuctionState.hudX < 0 ? g.guiWidth() - w - 6 : Math.max(0, Math.min(AuctionState.hudX, g.guiWidth() - w));
+        int y = Math.max(0, Math.min(AuctionState.hudY, g.guiHeight() - h));
 
 		g.fill(x, y, x + w, y + h, 0xC0101010);
 		g.fill(x, y, x + w, y + 1, 0xFFFFD700);

@@ -20,3 +20,11 @@ Only reads your own chat - no server changes, no automation. Check DonutSMP's ru
 1. Make a free GitHub account, create a new repository, and upload everything in this folder (including the hidden `.github` folder).
 2. Open the repo's **Actions** tab -> the "build" run -> download the **dsauction-mod** artifact.
 3. Unzip it: the file ending in `.jar` (not `-sources.jar`) is the mod. Put it in `.minecraft/mods`.
+
+
+## Added features
+- Item picker includes registry items intended for normal survival acquisition, excluding spawn eggs, potion items, and configured denied items. DonutSMP-specific availability may differ from vanilla survival.
+- Search by item name.
+- Press the configured `K` key (change it in Minecraft Controls) or use `/ac` to open the menu.
+- Click **TP to winner** to put `/tpa WinnerName` into chat for review; you still press Enter yourself. Requires DonutSMP to support `/tpa`.
+- HUD positioning/width commands: `/ac left`, `/ac right`, `/ac up`, `/ac down`, `/ac wider`, `/ac narrower`; `/ac hud` toggles it.

@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +16,7 @@ public class BlockPickerScreen extends Screen {
 	private final Button[] cells = new Button[PER_PAGE];
 	private List<Item> filtered = new ArrayList<>();
 	private EditBox search;
-	private Button prev, next, startStop, hud;
+	private Button prev, next, startStop, hud, teleport;
 	private int page = 0;
 	private String query = "";
 
@@ -52,6 +53,12 @@ public class BlockPickerScreen extends Screen {
 			.bounds(bx + (bw + gap) * 2, by, bw, 20).build());
 		addRenderableWidget(Button.builder(Component.literal("Done"), b -> onClose())
 			.bounds(bx + (bw + gap) * 3, by, bw, 20).build());
+        teleport = addRenderableWidget(Button.builder(Component.literal("TP to winner (prefill /tpa)"), b -> {
+            List<Map.Entry<String, Double>> ranking = AuctionState.ranking();
+            if (!ranking.isEmpty() && minecraft != null) {
+                minecraft.setScreen(new ChatScreen("/tpa " + ranking.get(0).getKey()));
+            }
+        }).bounds(width / 2 - 100, by + 24, 200, 20).build());
 
 		filter();
 		updateLabels();
@@ -91,7 +98,7 @@ public class BlockPickerScreen extends Screen {
 	@Override
 	public void render(GuiGraphics g, int mx, int my, float delta) {
 		super.render(g, mx, my, delta);
-		g.drawCenteredString(font, "DonutSMP Auction - pick the auction block", width / 2, 8, 0xFFFFFFFF);
+		g.drawCenteredString(font, "DonutSMP Auction - pick an item", width / 2, 8, 0xFFFFFFFF);
 		String hover = null;
 		for (int i = 0; i < PER_PAGE; i++) {
 			if (!cells[i].visible) continue;
@@ -103,9 +110,9 @@ public class BlockPickerScreen extends Screen {
 			if (cells[i].isMouseOver(mx, my)) hover = BlockList.name(it);
 		}
 		int pages = Math.max(1, (filtered.size() + PER_PAGE - 1) / PER_PAGE);
-		g.drawCenteredString(font, "Page " + (page + 1) + "/" + pages + "  (" + filtered.size() + " blocks)",
+		g.drawCenteredString(font, "Page " + (page + 1) + "/" + pages + "  (" + filtered.size() + " items)",
 			width / 2, prev.getY() + 6, 0xFFAAAAAA);
-		int sy = startStop.getY() + 30;
+		int sy = teleport.getY() + 26;
 		g.renderItem(new ItemStack(AuctionState.item), width / 2 - 80, sy - 4);
 		g.drawString(font, "Auction item: " + BlockList.name(AuctionState.item), width / 2 - 58, sy, 0xFFFFD700);
 		g.drawCenteredString(font, AuctionState.active ? "Auction is LIVE - counting /pay totals" : "Auction stopped",

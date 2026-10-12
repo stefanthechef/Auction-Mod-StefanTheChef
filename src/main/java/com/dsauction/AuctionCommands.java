@@ -23,6 +23,12 @@ public final class AuctionCommands {
 					c.getSource().sendFeedback(Component.literal("Totals cleared.")); return 1; }))
 				.then(ClientCommandManager.literal("hud").executes(c -> {
 					AuctionState.hudVisible = !AuctionState.hudVisible;
-					c.getSource().sendFeedback(Component.literal("HUD " + (AuctionState.hudVisible ? "on" : "off"))); return 1; }))));
+					c.getSource().sendFeedback(Component.literal("HUD " + (AuctionState.hudVisible ? "on" : "off"))); return 1; }))
+                .then(ClientCommandManager.literal("left").executes(c -> { AuctionState.hudX = 6; c.getSource().sendFeedback(Component.literal("HUD moved left.")); return 1; }))
+                .then(ClientCommandManager.literal("right").executes(c -> { AuctionState.hudX = -1; c.getSource().sendFeedback(Component.literal("HUD moved right.")); return 1; }))
+                .then(ClientCommandManager.literal("up").executes(c -> { AuctionState.hudY = Math.max(0, AuctionState.hudY - 10); return 1; }))
+                .then(ClientCommandManager.literal("down").executes(c -> { AuctionState.hudY += 10; return 1; }))
+                .then(ClientCommandManager.literal("wider").executes(c -> { AuctionState.hudWidth = Math.min(280, AuctionState.hudWidth + 10); return 1; }))
+                .then(ClientCommandManager.literal("narrower").executes(c -> { AuctionState.hudWidth = Math.max(150, AuctionState.hudWidth - 10); return 1; }))));
 	}
 }
