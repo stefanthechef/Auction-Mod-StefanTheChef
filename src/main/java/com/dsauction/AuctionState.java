@@ -3,6 +3,11 @@ package com.dsauction;
 import java.util.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Properties;
+import net.minecraft.client.Minecraft;
 
 /** Holds the live auction: the item, on/off flag and each player's TOTAL paid. */
 public final class AuctionState {
@@ -12,6 +17,41 @@ public final class AuctionState {
     public static int hudX = -1; // -1 means right aligned
     public static int hudY = 6;
     public static int hudWidth = 190;
+    public static double hudScale = 1.0;
+    public static boolean hudDragging = false;
+    public static int dragOffsetX = 0;
+    public static int dragOffsetY = 0;
+    private static boolean previousLeftPressed = false;
+
+    public static void loadHudSettings() {
+        Path path = Minecraft.getInstance().gameDirectory.toPath().resolve("config/dsauction.properties");
+        Properties p = new Properties();
+        try {
+            if (Files.exists(path)) {
+                try (var in = Files.newInputStream(path)) { p.load(in); }
+                hudX = Integer.parseInt(p.getProperty("hudX", "-1"));
+                hudY = Integer.parseInt(p.getProperty("hudY", "6"));
+                hudWidth = Math.max(150, Math.min(280, Integer.parseInt(p.getProperty("hudWidth", "190"))));
+                hudScale = Math.max(0.6, Math.min(2.0, Double.parseDouble(p.getProperty("hudScale", "1.0"))));
+            }
+        } catch (IOException | NumberFormatException ignored) { }
+    }
+
+    public static void saveHudSettings() {
+        Path path = Minecraft.getInstance().gameDirectory.toPath().resolve("config/dsauction.properties");
+        Properties p = new Properties();
+        p.setProperty("hudX", Integer.toString(hudX));
+        p.setProperty("hudY", Integer.toString(hudY));
+        p.setProperty("hudWidth", Integer.toString(hudWidth));
+        p.setProperty("hudScale", Double.toString(hudScale));
+        try {
+            Files.createDirectories(path.getParent());
+            try (var out = Files.newOutputStream(path)) { p.store(out, "DonutSMP Auction HUD settings"); }
+        } catch (IOException ignored) { }
+    }
+
+    public static boolean wasLeftPressed() { return previousLeftPressed; }
+    public static void setPreviousLeftPressed(boolean pressed) { previousLeftPressed = pressed; }
 	/** player name -> TOTAL of every /pay they sent you during the auction. */
 	public static final Map<String, Double> totals = new LinkedHashMap<>();
 

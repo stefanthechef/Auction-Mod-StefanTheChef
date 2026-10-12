@@ -28,3 +28,10 @@ Only reads your own chat - no server changes, no automation. Check DonutSMP's ru
 - Press the configured `K` key (change it in Minecraft Controls) or use `/ac` to open the menu.
 - Click **TP to winner** to put `/tpa WinnerName` into chat for review; you still press Enter yourself. Requires DonutSMP to support `/tpa`.
 - HUD positioning/width commands: `/ac left`, `/ac right`, `/ac up`, `/ac down`, `/ac wider`, `/ac narrower`; `/ac hud` toggles it.
+
+
+### HUD sizing
+- Drag the HUD with the left mouse button to move it.
+- Scroll forward while the mouse is over the HUD to make it bigger.
+- Scroll backward while the mouse is over the HUD to make it smaller.
+- HUD size and position are saved in `config/dsauction.properties`.

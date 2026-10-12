@@ -7,6 +7,7 @@
   "authors": ["you"],
   "environment": "client",
   "entrypoints": { "client": ["com.dsauction.DsAuctionClient"] },
+  "mixins": ["dsauction.mixins.json"],
   "depends": {
     "fabricloader": ">=0.18.0",
     "minecraft": "~1.21.11",
