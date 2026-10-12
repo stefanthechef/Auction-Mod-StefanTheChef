@@ -63,7 +63,7 @@ public class BlockPickerScreen extends Screen {
         }).bounds(width / 2 - 100, by + 24, 200, 20).build());
 
         // Auction timer controls live directly inside the /ac menu.
-        int timerY = by + 54;
+        int timerY = by + 70;
         int timerStartX = width / 2 - 135;
         timerHours = new EditBox(font, timerStartX, timerY, 42, 18, Component.literal("Hours"));
         timerMinutes = new EditBox(font, timerStartX + 47, timerY, 42, 18, Component.literal("Minutes"));
@@ -86,7 +86,7 @@ public class BlockPickerScreen extends Screen {
         }).bounds(timerStartX + 222, timerY, 48, 18).build());
 
         // Minimum accepted payment filter, configured directly in /ac.
-        int minY = timerY + 43;
+        int minY = timerY + 39;
         minimumPaymentField = new EditBox(font, width / 2 - 135, minY, 155, 18, Component.literal("Minimum payment"));
         minimumPaymentField.setHint(Component.literal("0 = no minimum"));
         minimumPaymentField.setValue(formatInputAmount(AuctionState.minimumPayment));
@@ -169,47 +169,47 @@ public class BlockPickerScreen extends Screen {
 
 	@Override
 	public void render(GuiGraphics g, int mx, int my, float delta) {
-		g.drawCenteredString(font, "DonutSMP Auction - pick an item", width / 2, 8, 0xFFFFFFFF);
-		String hover = null;
-		for (int i = 0; i < PER_PAGE; i++) {
-			if (!cells[i].visible) continue;
-			int n = page * PER_PAGE + i;
-			Item it = filtered.get(n);
-			g.renderItem(new ItemStack(it), cells[i].getX() + 2, cells[i].getY() + 2);
-			if (it == AuctionState.item)
-				g.fill(cells[i].getX(), cells[i].getY(), cells[i].getX() + 20, cells[i].getY() + 1, 0xFFFFD700);
-			if (cells[i].isMouseOver(mx, my)) hover = BlockList.name(it);
-		}
-		int pages = Math.max(1, (filtered.size() + PER_PAGE - 1) / PER_PAGE);
-		g.drawCenteredString(font, "Page " + (page + 1) + "/" + pages + "  (" + filtered.size() + " items)",
-			width / 2, prev.getY() + 6, 0xFFAAAAAA);
-        // Separate, softly framed settings rows prevent timer/minimum controls from overlapping.
+        // Draw the settings panel BEFORE widgets render so it never covers inputs/buttons.
         int panelLeft = width / 2 - 150;
         int panelRight = width / 2 + 150;
         int panelTop = timerHours.getY() - 21;
-        int panelBottom = minimumPaymentField.getY() + 24;
-        // Panels are painted before widgets below, so they never cover text fields/buttons.
-        g.fill(panelLeft, panelTop, panelRight, panelBottom, 0xB90A1019);
+        int panelBottom = minimumPaymentField.getY() + 25;
+        g.fill(panelLeft, panelTop, panelRight, panelBottom, 0xD90A1019);
         g.fill(panelLeft, panelTop, panelRight, panelTop + 1, 0xFF31506B);
         g.fill(panelLeft, panelBottom - 1, panelRight, panelBottom, 0xFF31506B);
         g.fill(panelLeft, panelTop, panelLeft + 1, panelBottom, 0xFF31506B);
         g.fill(panelRight - 1, panelTop, panelRight, panelBottom, 0xFF31506B);
-        // Draw widgets after panel backgrounds so input boxes and buttons remain visible.
+
         super.render(g, mx, my, delta);
+        g.drawCenteredString(font, "DonutSMP Auction - pick an item", width / 2, 8, 0xFFFFFFFF);
+        String hover = null;
+        for (int i = 0; i < PER_PAGE; i++) {
+            if (!cells[i].visible) continue;
+            int n = page * PER_PAGE + i;
+            Item it = filtered.get(n);
+            g.renderItem(new ItemStack(it), cells[i].getX() + 2, cells[i].getY() + 2);
+            if (it == AuctionState.item)
+                g.fill(cells[i].getX(), cells[i].getY(), cells[i].getX() + 20, cells[i].getY() + 1, 0xFFFFD700);
+            if (cells[i].isMouseOver(mx, my)) hover = BlockList.name(it);
+        }
+        int pages = Math.max(1, (filtered.size() + PER_PAGE - 1) / PER_PAGE);
+        g.drawCenteredString(font, "Page " + (page + 1) + "/" + pages + "  (" + filtered.size() + " items)",
+            width / 2, prev.getY() + 6, 0xFFB7C7D9);
         g.drawCenteredString(font, "Auction timer", width / 2, timerHours.getY() - 17, 0xFF8CCBFF);
         g.drawString(font, "Hours", timerHours.getX() + 7, timerHours.getY() + 19, 0xFFB7C7D9);
         g.drawString(font, "Minutes", timerMinutes.getX() + 3, timerMinutes.getY() + 19, 0xFFB7C7D9);
         g.drawString(font, "Seconds", timerSeconds.getX() + 3, timerSeconds.getY() + 19, 0xFFB7C7D9);
         g.drawString(font, "Minimum payment", minimumPaymentField.getX(), minimumPaymentField.getY() - 10, 0xFFFFD166);
-        g.drawString(font, "Ignore payments below this amount (0 = off)", minimumPaymentField.getX(), minimumPaymentField.getY() + 20, 0xFFAAAAAA);
-		int sy = minimumPaymentField.getY() + 31;
-        g.fill(width / 2 - 150, sy - 5, width / 2 + 150, sy + 14, 0xB90A1019);
+        g.drawString(font, "Payments below this amount are ignored (0 = off)", minimumPaymentField.getX(), minimumPaymentField.getY() + 20, 0xFFB7C7D9);
+
+        int sy = minimumPaymentField.getY() + 39;
+        g.fill(width / 2 - 150, sy - 5, width / 2 + 150, sy + 14, 0xD90A1019);
         g.fill(width / 2 - 150, sy - 5, width / 2 + 150, sy - 4, 0xFF174A73);
-		g.renderItem(new ItemStack(AuctionState.item), width / 2 - 115, sy - 4);
-		g.drawString(font, "Auction item: " + BlockList.name(AuctionState.item), width / 2 - 92, sy, 0xFFFFD700);
-		g.drawCenteredString(font, AuctionState.active ? "Auction is LIVE - counting /pay totals" : "Auction stopped",
-			width / 2, sy + 14, AuctionState.active ? 0xFF55FF55 : 0xFFFF5555);
-		if (hover != null) g.drawCenteredString(font, hover, width / 2, 40, 0xFFFFFFAA);
+        g.renderItem(new ItemStack(AuctionState.item), width / 2 - 115, sy - 4);
+        g.drawString(font, "Auction item: " + BlockList.name(AuctionState.item), width / 2 - 92, sy, 0xFFFFD700);
+        g.drawCenteredString(font, AuctionState.active ? "Auction is LIVE - counting /pay totals" : "Auction stopped",
+            width / 2, sy + 14, AuctionState.active ? 0xFF55FF55 : 0xFFFF5555);
+        if (hover != null) g.drawCenteredString(font, hover, width / 2, 40, 0xFFFFFFAA);
 	}
 
 	@Override

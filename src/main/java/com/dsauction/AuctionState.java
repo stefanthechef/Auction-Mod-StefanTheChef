@@ -80,7 +80,8 @@ public final class AuctionState {
     }
 
 	public static void addPayment(String player, double amount) {
-		if (!active) return;
+        // Enforce the configured threshold here so every payment source uses the same rule.
+        if (!active || !Double.isFinite(amount) || amount < minimumPayment) return;
 		totals.merge(player, amount, Double::sum);
 	}
 
