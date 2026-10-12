@@ -16,7 +16,8 @@ public class BlockPickerScreen extends Screen {
 	private final Button[] cells = new Button[PER_PAGE];
 	private List<Item> filtered = new ArrayList<>();
 	private EditBox search;
-	private Button prev, next, startStop, hud, teleport;
+	private Button prev, next, startStop, hud, teleport, startTimer, stopTimer;
+	private EditBox timerHours, timerMinutes, timerSeconds;
 	private int page = 0;
 	private String query = "";
 
@@ -60,6 +61,28 @@ public class BlockPickerScreen extends Screen {
             }
         }).bounds(width / 2 - 100, by + 24, 200, 20).build());
 
+        // Auction timer controls live directly inside the /ac menu.
+        int timerY = by + 51;
+        int timerStartX = width / 2 - 112;
+        timerHours = new EditBox(font, timerStartX, timerY, 42, 18, Component.literal("Hours"));
+        timerMinutes = new EditBox(font, timerStartX + 47, timerY, 42, 18, Component.literal("Minutes"));
+        timerSeconds = new EditBox(font, timerStartX + 94, timerY, 42, 18, Component.literal("Seconds"));
+        timerHours.setValue("0");
+        timerMinutes.setValue("5");
+        timerSeconds.setValue("0");
+        timerHours.setFilter(v -> v.matches("\\d{0,4}"));
+        timerMinutes.setFilter(v -> v.matches("\\d{0,2}"));
+        timerSeconds.setFilter(v -> v.matches("\\d{0,2}"));
+        addRenderableWidget(timerHours);
+        addRenderableWidget(timerMinutes);
+        addRenderableWidget(timerSeconds);
+        startTimer = addRenderableWidget(Button.builder(Component.literal("Start timer"), b -> startTimerFromFields())
+            .bounds(timerStartX + 141, timerY, 76, 18).build());
+        stopTimer = addRenderableWidget(Button.builder(Component.literal("Stop"), b -> {
+            AuctionState.stopTimer();
+            AuctionState.active = false;
+        }).bounds(timerStartX + 222, timerY, 48, 18).build());
+
 		filter();
 		updateLabels();
 	}
@@ -68,6 +91,23 @@ public class BlockPickerScreen extends Screen {
 		startStop.setMessage(Component.literal(AuctionState.active ? "Stop auction" : "Start auction"));
 		hud.setMessage(Component.literal("HUD: " + (AuctionState.hudVisible ? "ON" : "OFF")));
 	}
+
+    private void startTimerFromFields() {
+        try {
+            long hours = timerHours.getValue().isBlank() ? 0 : Long.parseLong(timerHours.getValue());
+            long minutes = timerMinutes.getValue().isBlank() ? 0 : Long.parseLong(timerMinutes.getValue());
+            long seconds = timerSeconds.getValue().isBlank() ? 0 : Long.parseLong(timerSeconds.getValue());
+            long duration = Math.addExact(Math.addExact(Math.multiplyExact(hours, 3600L), Math.multiplyExact(minutes, 60L)), seconds);
+            if (duration < 1 || duration > 604800) {
+                if (minecraft != null && minecraft.player != null) minecraft.player.displayClientMessage(Component.literal("Choose a duration between 1 second and 7 days."), false);
+                return;
+            }
+            AuctionState.startTimer(duration);
+            if (minecraft != null && minecraft.player != null) minecraft.player.displayClientMessage(Component.literal("Auction timer started."), false);
+        } catch (NumberFormatException | ArithmeticException ignored) {
+            if (minecraft != null && minecraft.player != null) minecraft.player.displayClientMessage(Component.literal("Invalid timer duration."), false);
+        }
+    }
 
 	private void filter() {
 		String q = query.trim().toLowerCase(Locale.ROOT);
@@ -112,7 +152,8 @@ public class BlockPickerScreen extends Screen {
 		int pages = Math.max(1, (filtered.size() + PER_PAGE - 1) / PER_PAGE);
 		g.drawCenteredString(font, "Page " + (page + 1) + "/" + pages + "  (" + filtered.size() + " items)",
 			width / 2, prev.getY() + 6, 0xFFAAAAAA);
-		int sy = teleport.getY() + 26;
+        g.drawString(font, "Timer: hours / minutes / seconds", width / 2 - 112, timerHours.getY() - 10, 0xFFAAAAAA);
+		int sy = timerHours.getY() + 25;
 		g.renderItem(new ItemStack(AuctionState.item), width / 2 - 80, sy - 4);
 		g.drawString(font, "Auction item: " + BlockList.name(AuctionState.item), width / 2 - 58, sy, 0xFFFFD700);
 		g.drawCenteredString(font, AuctionState.active ? "Auction is LIVE - counting /pay totals" : "Auction stopped",

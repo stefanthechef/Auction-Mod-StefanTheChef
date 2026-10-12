@@ -9,6 +9,7 @@ public class DsAuctionClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		AuctionState.loadHudSettings();
 		PayTracker.register();
 		AuctionHud.register();
 		AuctionCommands.register();

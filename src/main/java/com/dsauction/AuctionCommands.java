@@ -17,6 +17,7 @@ public final class AuctionCommands {
 					c.getSource().sendFeedback(Component.literal("Auction started - counting /pay totals.")); return 1; }))
 				.then(ClientCommandManager.literal("stop").executes(c -> {
 					AuctionState.active = false;
+                    AuctionState.stopTimer();
 					c.getSource().sendFeedback(Component.literal("Auction stopped.")); return 1; }))
 				.then(ClientCommandManager.literal("reset").executes(c -> {
 					AuctionState.reset();

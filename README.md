@@ -35,3 +35,6 @@ Only reads your own chat - no server changes, no automation. Check DonutSMP's ru
 - Scroll forward while the mouse is over the HUD to make it bigger.
 - Scroll backward while the mouse is over the HUD to make it smaller.
 - HUD size and position are saved in `config/dsauction.properties`.
+
+
+Auction timer controls are available in the `/ac` menu: enter hours, minutes, and seconds, then click **Start timer**. Click **Stop** to stop the countdown. Durations from 1 second to 7 days are supported. This source ZIP has not yet been compiled or tested in-game.

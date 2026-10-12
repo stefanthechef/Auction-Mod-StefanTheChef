@@ -18,6 +18,8 @@ public final class AuctionState {
     public static int hudY = 6;
     public static int hudWidth = 190;
     public static double hudScale = 1.0;
+    public static long timerEndMillis = 0L;
+    public static long timerDurationSeconds = 0L;
     public static boolean hudDragging = false;
     public static int dragOffsetX = 0;
     public static int dragOffsetY = 0;
@@ -56,6 +58,22 @@ public final class AuctionState {
 	public static final Map<String, Double> totals = new LinkedHashMap<>();
 
 	private AuctionState() {}
+
+    public static void startTimer(long seconds) {
+        timerDurationSeconds = Math.max(1, seconds);
+        timerEndMillis = System.currentTimeMillis() + timerDurationSeconds * 1000L;
+        active = true;
+    }
+
+    public static long secondsRemaining() {
+        if (timerEndMillis <= 0L) return -1L;
+        return Math.max(0L, (timerEndMillis - System.currentTimeMillis() + 999L) / 1000L);
+    }
+
+    public static void stopTimer() {
+        timerEndMillis = 0L;
+        timerDurationSeconds = 0L;
+    }
 
 	public static void addPayment(String player, double amount) {
 		if (!active) return;
