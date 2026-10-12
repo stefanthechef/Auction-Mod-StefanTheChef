@@ -3,10 +3,14 @@ package com.dsauction;
 import java.util.regex.*;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 
-/** Reads chat for DonutSMP's "<Player> paid you $<amount>" line and adds it to that player's total. */
+/** Reads payment confirmations from DonutSMP and servers using "sent you $<amount>". */
 public final class PayTracker {
+	private static final String AMOUNT = "\\$([0-9][0-9,]*(?:\\.[0-9]+)?)\\s*([kKmMbBtT]?)";
 	private static final Pattern PAID = Pattern.compile(
-		"([A-Za-z0-9_.]{3,20}) paid you \\$([0-9][0-9,]*(?:\\.[0-9]+)?)\\s*([kKmMbBtT]?)");
+		"([A-Za-z0-9_.]{3,20}) paid you " + AMOUNT, Pattern.CASE_INSENSITIVE);
+	// Example: "PAY ➜ Raktus_GHG sent you $1"
+	private static final Pattern SENT_YOU = Pattern.compile(
+		"(?:^|\\s)([A-Za-z0-9_.]{3,20}) sent you " + AMOUNT, Pattern.CASE_INSENSITIVE);
 
 	private PayTracker() {}
 
@@ -19,7 +23,10 @@ public final class PayTracker {
 
 	static void handle(String text) {
 		Matcher m = PAID.matcher(text);
-		if (!m.find()) return;
+		if (!m.find()) {
+			m = SENT_YOU.matcher(text);
+			if (!m.find()) return;
+		}
 		try {
 			double amount = Double.parseDouble(m.group(2).replace(",", ""));
 			switch (m.group(3).toLowerCase()) {
