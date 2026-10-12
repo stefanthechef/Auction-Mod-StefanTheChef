@@ -86,7 +86,7 @@ public class BlockPickerScreen extends Screen {
         }).bounds(timerStartX + 222, timerY, 48, 18).build());
 
         // Minimum accepted payment filter, configured directly in /ac.
-        int minY = timerY + 29;
+        int minY = timerY + 43;
         minimumPaymentField = new EditBox(font, width / 2 - 135, minY, 155, 18, Component.literal("Minimum payment"));
         minimumPaymentField.setHint(Component.literal("0 = no minimum"));
         minimumPaymentField.setValue(formatInputAmount(AuctionState.minimumPayment));
@@ -169,7 +169,6 @@ public class BlockPickerScreen extends Screen {
 
 	@Override
 	public void render(GuiGraphics g, int mx, int my, float delta) {
-		super.render(g, mx, my, delta);
 		g.drawCenteredString(font, "DonutSMP Auction - pick an item", width / 2, 8, 0xFFFFFFFF);
 		String hover = null;
 		for (int i = 0; i < PER_PAGE; i++) {
@@ -189,11 +188,14 @@ public class BlockPickerScreen extends Screen {
         int panelRight = width / 2 + 150;
         int panelTop = timerHours.getY() - 21;
         int panelBottom = minimumPaymentField.getY() + 24;
+        // Panels are painted before widgets below, so they never cover text fields/buttons.
         g.fill(panelLeft, panelTop, panelRight, panelBottom, 0xB90A1019);
         g.fill(panelLeft, panelTop, panelRight, panelTop + 1, 0xFF31506B);
         g.fill(panelLeft, panelBottom - 1, panelRight, panelBottom, 0xFF31506B);
         g.fill(panelLeft, panelTop, panelLeft + 1, panelBottom, 0xFF31506B);
         g.fill(panelRight - 1, panelTop, panelRight, panelBottom, 0xFF31506B);
+        // Draw widgets after panel backgrounds so input boxes and buttons remain visible.
+        super.render(g, mx, my, delta);
         g.drawCenteredString(font, "Auction timer", width / 2, timerHours.getY() - 17, 0xFF8CCBFF);
         g.drawString(font, "Hours", timerHours.getX() + 7, timerHours.getY() + 19, 0xFFB7C7D9);
         g.drawString(font, "Minutes", timerMinutes.getX() + 3, timerMinutes.getY() + 19, 0xFFB7C7D9);
